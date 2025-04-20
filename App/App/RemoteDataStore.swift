@@ -60,12 +60,9 @@ final class RemoteDataStore: DataStore {
     }
     
     func save(_ request: DataStoreSaveChangesRequest<DefaultSnapshot>) throws -> DataStoreSaveChangesResult<DefaultSnapshot> {
-        let semaphore = DispatchSemaphore(value: 0)
         let identifier = identifier
         
         Task {
-            defer { semaphore.signal() }
-            
             do {
                 let insertItems = try request.inserted.map {
                     let persistentIdentifier = try PersistentIdentifier.identifier(
@@ -91,7 +88,6 @@ final class RemoteDataStore: DataStore {
                 print(error)
             }
         }
-        semaphore.wait()
         
         return .init(for: identifier)
     }
