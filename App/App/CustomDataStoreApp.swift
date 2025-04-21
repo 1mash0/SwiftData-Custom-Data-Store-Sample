@@ -7,7 +7,7 @@ struct CustomDataStoreApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(makeModelContainer(.local))
+        .modelContainer(makeModelContainer())
     }
 }
 
@@ -32,11 +32,14 @@ enum ModelContainerType {
     }
 }
 
-func makeModelContainer(_ type: ModelContainerType) -> ModelContainer {
+func makeModelContainer(_ type: ModelContainerType? = nil) -> ModelContainer {
     let schema = Schema([
         Item.self,
     ])
     do {
+        guard let type = type else {
+            return try ModelContainer(for: schema, configurations: .init(isStoredInMemoryOnly: false))
+        }
         return try ModelContainer(for: schema, configurations: [type.modelConfiguration])
     } catch {
         fatalError("Could not create ModelContainer: \(error)")
