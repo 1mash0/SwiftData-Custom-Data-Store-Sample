@@ -43,9 +43,7 @@ struct ItemController<Context: RequestContext> {
     @Sendable
     func deleteItems(_ request: Request, context: Context) async throws -> HTTPResponse.Status {
         do {
-            let deleteIDs = try await request.decode(as: [Item].self, context: context)
-                .map({ $0.id })
-                .compactMap({$0})
+            let deleteIDs = try await request.decode(as: [Item].self, context: context).compactMap { $0.id }
             
             if deleteIDs.isEmpty {
                 return .notFound
