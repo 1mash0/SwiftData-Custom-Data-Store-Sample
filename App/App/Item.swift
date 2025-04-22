@@ -7,9 +7,11 @@ class Item {
     
     var id: UUID
     var timestamp: Date
+    var isDeleted: Bool
     
-    init() {
-        self.id = UUID()
-        self.timestamp = Date()
+    init(isDeleted: Bool = false) {
+        self.id = .init()
+        self.timestamp = .now
+        self.isDeleted = isDeleted
     }
 }
