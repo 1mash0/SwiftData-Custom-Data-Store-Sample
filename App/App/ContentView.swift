@@ -39,6 +39,11 @@ struct ContentView: View {
         withAnimation {
             let newItem = Item()
             modelContext.insert(newItem)
+            do {
+                try modelContext.save()
+            } catch {
+                print(error)
+            }
         }
     }
     
@@ -46,6 +51,11 @@ struct ContentView: View {
         withAnimation {
             for index in offsets {
                 modelContext.delete(items[index])
+                do {
+                    try modelContext.save()
+                } catch {
+                    print(error)
+                }
             }
         }
     }

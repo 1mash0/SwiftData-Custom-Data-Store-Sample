@@ -60,11 +60,34 @@ final class RemoteDataStore: DataStore {
     }
     
     func save(_ request: DataStoreSaveChangesRequest<DefaultSnapshot>) throws -> DataStoreSaveChangesResult<DefaultSnapshot> {
+        let semaphore = DispatchSemaphore(value: 0)
         let identifier = identifier
         
         Task {
+            defer { semaphore.signal() }
+            
             do {
-                let insertItems = try request.inserted.map {
+                // insert
+                // request.deletedに存在するアイテムは除外する(他にもっといい方法ありそう)
+                let insertItems = try request.inserted
+                    .filter { item in
+                        !request.deleted.contains(where: { $0.persistentIdentifier.id == item.persistentIdentifier.id })
+                    }
+                    .map {
+                        let persistentIdentifier = try PersistentIdentifier.identifier(
+                            for: identifier,
+                            entityName: $0.persistentIdentifier.entityName,
+                            primaryKey: UUID()
+                        )
+                        return $0.copy(persistentIdentifier: persistentIdentifier)
+                    }
+                
+                if !insertItems.isEmpty {
+                    try await APIClient.register(insertItems)
+                }
+                
+                // delete
+                let deleteItems = try request.deleted.map {
                     let persistentIdentifier = try PersistentIdentifier.identifier(
                         for: identifier,
                         entityName: $0.persistentIdentifier.entityName,
@@ -72,22 +95,15 @@ final class RemoteDataStore: DataStore {
                     )
                     return $0.copy(persistentIdentifier: persistentIdentifier)
                 }
-                
-                if !insertItems.isEmpty {
-                    try await APIClient.register(insertItems)
-                }
-                
-//                for snapshot in request.updated {
-//
-//                }
 
-//                for snapshot in request.deleted {
-//
-//                }
+                if !deleteItems.isEmpty {
+                    try await APIClient.delete(deleteItems)
+                }
             } catch {
                 print(error)
             }
         }
+        semaphore.wait()
         
         return .init(for: identifier)
     }

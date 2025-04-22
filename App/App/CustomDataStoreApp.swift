@@ -7,7 +7,7 @@ struct CustomDataStoreApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(makeModelContainer())
+        .modelContainer(makeModelContainer(.remote))
     }
 }
 
