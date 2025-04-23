@@ -7,7 +7,7 @@ struct CustomDataStoreApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(makeModelContainer(.remote))
+        .modelContainer(makeModelContainer(.local))
     }
 }
 
@@ -20,12 +20,12 @@ enum ModelContainerType {
             case .local:
                 let fileURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("item.json")
                 return LocalStoreConfiguration(
-                    name: "item",
+                    name: "LocalItem",
                     fileURL: fileURL
                 )
             case .remote:
                 return RemoteStoreConfiguration(
-                    name: "item",
+                    name: "RemoteItem",
                     endpoint: URL(string:"http://localhost:8080/items")!
                 )
         }
