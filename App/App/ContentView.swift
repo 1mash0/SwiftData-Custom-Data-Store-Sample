@@ -29,23 +29,9 @@ struct ContentView: View {
                         Label("Add Item", systemImage: "plus")
                     }
                 }
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: fetch) {
-                        Label("Reload Item", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
-                    }
-                }
             }
         } detail: {
             Text("Select an item")
-        }
-    }
-    
-    private func fetch() {
-        let descriptor = FetchDescriptor<Item>()
-        do {
-            _ = try modelContext.fetch(descriptor)
-        } catch {
-            print(error)
         }
     }
     
