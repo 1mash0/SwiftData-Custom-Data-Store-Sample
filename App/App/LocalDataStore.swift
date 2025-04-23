@@ -48,7 +48,7 @@ final class LocalDataStore: DataStore {
         
         let objects = try self.read()
         let snapshot = objects.values.map { $0 }
-        return .init(descriptor: request.descriptor, fetchedSnapshots: snapshot)
+        return .init(descriptor: request.descriptor, fetchedSnapshots: snapshot, relatedSnapshots: objects)
     }
     
     func save(_ request: DataStoreSaveChangesRequest<DefaultSnapshot>) throws -> DataStoreSaveChangesResult<DefaultSnapshot> {
@@ -90,8 +90,8 @@ final class LocalDataStore: DataStore {
         
         let items = try decoder.decode([DefaultSnapshot].self, from: try Data(contentsOf: configuration.fileURL))
         var result = [PersistentIdentifier: DefaultSnapshot]()
-        items.forEach {
-            result[$0.persistentIdentifier] = $0
+        for item in items {
+            result[item.persistentIdentifier] = item
         }
         
         return result

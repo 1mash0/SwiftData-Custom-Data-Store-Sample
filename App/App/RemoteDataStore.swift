@@ -56,7 +56,14 @@ final class RemoteDataStore: DataStore {
         }
         semaphore.wait()
         
-        return .init(descriptor: request.descriptor, fetchedSnapshots: try result.get())
+        let items = try result.get()
+        var relatedSnapshot = [PersistentIdentifier: DefaultSnapshot]()
+        
+        for item in items {
+            relatedSnapshot[item.persistentIdentifier] = item
+        }
+        
+        return .init(descriptor: request.descriptor, fetchedSnapshots: items, relatedSnapshots: relatedSnapshot)
     }
     
     func save(_ request: DataStoreSaveChangesRequest<DefaultSnapshot>) throws -> DataStoreSaveChangesResult<DefaultSnapshot> {
