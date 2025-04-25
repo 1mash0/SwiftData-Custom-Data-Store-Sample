@@ -38,7 +38,8 @@ func makeModelContainer(_ type: ModelContainerType? = nil) -> ModelContainer {
     ])
     do {
         guard let type = type else {
-            return try ModelContainer(for: schema, configurations: .init(isStoredInMemoryOnly: false))
+            let configuration = ModelConfiguration(isStoredInMemoryOnly: false)
+            return try ModelContainer(for: schema, configurations: configuration)
         }
         return try ModelContainer(for: schema, configurations: [type.modelConfiguration])
     } catch {
