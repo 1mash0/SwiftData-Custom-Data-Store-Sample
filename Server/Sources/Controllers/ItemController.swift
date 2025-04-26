@@ -4,7 +4,6 @@ import Hummingbird
 import HummingbirdFluent
 import NIO
 
-//struct ItemController<Context: MyRequestContextProtocol> {
 struct ItemController<Context: RequestContext> {
     let fluent: Fluent
     
@@ -18,6 +17,7 @@ struct ItemController<Context: RequestContext> {
     @Sendable
     func fetchItems(_ request: Request, context: Context) async throws -> [Item] {
         do {
+//            try await Task.sleep(nanoseconds: 1_000_000_000)
             return try await Item.query(on: fluent.db()).filter(\.$isDeleted == false).all()
         } catch {
             print(error)
@@ -28,7 +28,6 @@ struct ItemController<Context: RequestContext> {
     @Sendable
     func registerItems(_ request: Request, context: Context) async throws -> HTTPResponse.Status {
         do {
-//            let requestItem = try await context.requestDecoder.decode([Item].self, from: request, context: context)
             let requestItem = try await request.decode(as: [Item].self, context: context)
             for item in requestItem {
                 try await item.save(on: fluent.db())
